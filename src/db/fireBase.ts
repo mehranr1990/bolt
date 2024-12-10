@@ -18,7 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 // نمونه‌هایی برای استفاده
-const db = getFirestore(app);  // Firestore
+const fireBaseDb = getFirestore(app);  // Firestore
 const auth = getAuth(app);     // Authentication
 
-export { app, db, auth };
+export { app, fireBaseDb, auth };

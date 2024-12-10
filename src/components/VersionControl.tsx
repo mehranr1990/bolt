@@ -1,21 +1,36 @@
-import React, { useState } from 'react';
-import { useVersionControl } from '../hooks/useVersionControl';
-import { History, RotateCcw, Save } from 'lucide-react';
+import React, { useState } from "react";
+import { useVersionControl } from "../hooks/useVersionControl";
+import { History, RotateCcw, Save } from "lucide-react";
+import { doc, setDoc } from "firebase/firestore";
+import { fireBaseDb } from "../db/fireBase";
 
 const VersionControl: React.FC = () => {
   const { versions, loading, createVersion, restore } = useVersionControl();
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
   const [showVersions, setShowVersions] = useState(false);
 
   const handleSave = async () => {
     if (!description) return;
-    await createVersion(description);
-    setDescription('');
+    const data = await createVersion(description);
+    setDescription("");
     setShowVersions(false);
+    ///////////////// add data to fireBase //////////////////
+    const addData = async () => {
+      try {
+        await setDoc(doc(fireBaseDb, "test", description), {
+          data,
+        });
+        console.log("Document written with ID:");
+      } catch (error) {
+        console.error("Error adding document:", error);
+      }
+    };
+    addData();
+    ///////////////// add data to fireBase //////////////////
   };
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('fa-IR');
+    return new Date(timestamp).toLocaleString("fa-IR");
   };
 
   return (
@@ -62,7 +77,9 @@ const VersionControl: React.FC = () => {
                     className="p-2 bg-gray-50 rounded-lg text-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-800">{version.description}</span>
+                      <span className="text-gray-800">
+                        {version.description}
+                      </span>
                       <button
                         onClick={() => restore(version.id)}
                         className="p-1 text-blue-600 hover:text-blue-800"
